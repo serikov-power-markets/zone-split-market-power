@@ -10,7 +10,7 @@ nothing.
 
 Split: imports are at most K. The residual demand of the strategic generators is alpha - K - beta p (for prices above c_f).
 Competitive benchmark price p_c = min((alpha - K)/beta, c) when K < K_bar = alpha - beta c_f, else c_f.
-Cournot among n generators on that residual demand: total quantity n (A - beta c) / ((n+1) beta) ... see functions.
+Cournot among n generators on that residual demand: total quantity n (A - beta c) / (n+1), price c + (A - beta c) / ((n+1) beta).
 Notation: A = alpha - K (demand left after full import), K_c = alpha - beta c (critical import capacity).
 """
 from __future__ import annotations
