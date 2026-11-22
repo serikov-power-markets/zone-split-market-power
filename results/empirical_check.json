@@ -1,0 +1,45 @@
+{
+  "hours": 1464,
+  "share_hours_import_capacity_binds_flowbased": 0.49043715846994534,
+  "share_hours_binds_ntc_p10": 0.7233606557377049,
+  "mean_excess_when_binding_mw": 3249.0842633248258,
+  "median_one_zone_flow_mw": 10518.49087837802,
+  "median_fb_limit_mw": 11036.513665438128,
+  "south_dispatchable_mw": 40258.76020415,
+  "pivotal_one_zone": {
+    "share_pivotal": 0.0,
+    "mean_psi_when_pivotal": 0.0
+  },
+  "pivotal_split_flowbased": {
+    "share_pivotal": 0.0,
+    "mean_psi_when_pivotal": 0.0
+  },
+  "pivotal_split_ntc": {
+    "share_pivotal": 0.0,
+    "mean_psi_when_pivotal": 0.0
+  },
+  "pivotal_by_number_of_firms": {
+    "1": {
+      "one_zone": 0.980191256830601,
+      "split_flowbased": 0.98224043715847,
+      "split_ntc": 0.985655737704918
+    },
+    "2": {
+      "one_zone": 0.05874316939890711,
+      "split_flowbased": 0.11816939890710383,
+      "split_ntc": 0.14617486338797814
+    },
+    "3": {
+      "one_zone": 0.0006830601092896175,
+      "split_flowbased": 0.00273224043715847,
+      "split_ntc": 0.011612021857923498
+    },
+    "4": {
+      "one_zone": 0.0,
+      "split_flowbased": 0.0,
+      "split_ntc": 0.0
+    }
+  },
+  "share_hours_price_gap_over_1": 0.45081967213114754,
+  "mean_price_gap_when_gap": 13.885041702287708
+}
