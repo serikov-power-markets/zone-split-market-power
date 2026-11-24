@@ -2,7 +2,7 @@
 
 Research study with three parts: an analytic two-node model with a proposition and proof (when does a split raise the markup of a strategic generator, and by how much), numerical checks of the closed forms, and an empirical check on the hourly results of [de-bidding-zones](https://github.com/serikov-energy-systems/de-bidding-zones) (1,464 sampled hours of 2024 on the 780-bus German grid): in how many hours the mechanism of the proposition can operate. A fourth item, the exact solution of the two-stage recourse problem of an electric bus scheduling instance by L-shaped decomposition, is in [hamburg-ebus-scheduling](https://github.com/serikov-energy-systems/hamburg-ebus-scheduling) (`src/ebus/lshaped.py`).
 
-**What is not done.** A numerical equilibrium problem with equilibrium constraints (MPEC or diagonalised EPEC) on the 780-bus grid with strategic owners is not built. The plant data carry no owner, so strategic firms there would be assumptions; the empirical part uses stylised equal firms and says so. The proposition has ample generator capacities and a price-taking fringe; it is a model of a mechanism, not an estimate of market power in Germany.
+**What is not done.** A numerical equilibrium problem with equilibrium constraints (MPEC) or an EPEC on the nodal 780-bus grid is not built; v0.2 (below) solves a zonal Cournot game with real owners and exogenous flow limits instead. The proposition has ample generator capacities and a price-taking fringe; it is a model of a mechanism, not an estimate of market power in Germany.
 
 ## Question
 Does splitting a bidding zone raise market power in the importing zone, and how large can the effect be?
@@ -30,6 +30,24 @@ The closed forms are checked against numerical best responses in `tests/test_ana
 | 4 | 0% | 0% | 0% |
 
 With two equal firms the split doubles the number of pivotal hours, with four none are pivotal in the sample. The mechanism of the proposition can operate in a split south with two or three large firms; with a fragmented south it does not.
+
+## v0.2: Cournot equilibrium with plant owners on the German zonal market (`src/zsmp/grid_cournot.py`, `scripts/run_grid_cournot.py`, `results/grid_cournot_*.json`)
+**Question.** With the real ownership of the thermal fleet, does a north/south split raise the markup, and where?
+
+**Method.** The system, the demand, the renewables and the flow-based bounds on the net position of the north are those of the 200 sampled hours (every seventh of the 1,464) of `de-bidding-zones` (2024 fleet, 780-bus grid reduced to two zones, split at 51 degrees). Owners come from the Bundesnetzagentur power plant list (data of 5 Nov 2026, units of at least 10 MW in operation, `data/raw/`): operators are grouped into parent firms (RWE, EnBW, Uniper, LEAG, STEAG, Statkraft, Hamburger Energiewerke; Vattenfall and EWE have no lignite, coal or gas capacity in the list under this grouping) and assigned to the north or south zone by federal state (Saxony and North Rhine-Westphalia counted as north, because their large plants lie north of 51 degrees). The list has no coordinates, so the ownership share of a firm in a zone and fuel is applied to the model's plant groups of that zone and fuel. All other units (including all renewables, which run at zero cost) form a price-taking fringe at marginal cost. Each firm chooses its output in the north and in the south on a grid of 11 fractions of its available capacity; prices follow from market clearing with the flow bounded by the flow-based limits; best responses are iterated 14 times (damped after three rounds). Demand is made elastic around the competitive one-zone price with a **constant elasticity assumed at 0.05, 0.1 and 0.25**, because with perfectly inelastic demand Cournot gives the price cap whenever a firm is pivotal; the price cap is 600 EUR/MWh (assumed). At elasticity 0.1 the competitive benchmark (all units price takers) reproduces the price of the linear programme of `de-bidding-zones` with a mean absolute difference of 0.56 EUR/MWh in one zone and 1.1 (north) and 1.4 (south) in the split, correlation 0.98-0.999. The solver is checked against the closed-form monopoly output and price in a toy market (`tests/test_grid_cournot.py`).
+
+**Results (200 hours, EUR/MWh).**
+| Elasticity | Markup one zone (load-weighted) | Markup split (load-weighted) | Split, north | Split, south | Hours with markup above 5, one zone | Hours with markup above 5, split |
+|---|---:|---:|---:|---:|---:|---:|
+| 0.05 | 2.78 | 2.82 | 3.54 | 1.90 | 11.4% | 31.9% |
+| 0.10 | 2.20 | 2.48 | 3.18 | 1.65 | 6.2% | 29.0% |
+| 0.25 | 1.88 | 2.08 | 2.71 | 1.34 | 4.3% | 23.8% |
+
+- **The split raises the markup mostly in the hours when the line binds, and it raises it in the north.** The line binds in 59% of the sampled hours in the competitive split. At elasticity 0.1 the markup in the north is 4.4 EUR/MWh in these hours against 1.4 in the other hours. The load-weighted mean changes little (+0.04 to +0.28 EUR/MWh, below 0.3% of the price), but the share of hours with a markup above 5 EUR/MWh rises from 4-11% to 24-32%.
+- **Why the north.** The lignite owners (LEAG 52% and RWE 42% of the northern lignite capacity in the list) sit in the north, and the south is nearly atomistic: 82% of its gas capacity belongs to firms outside the grouped parents. When the line binds, the northern firms lose the export outlet and face a smaller residual demand; the importing south has few strategic units. This fits the proposition above (markup rises when the line binds) but not its setting (strategic generators in the importing zone): with the real ownership the mechanism acts on the exporting side.
+- **Convergence.** The mean change of the outputs between rounds falls to 3e-7 of the largest capacity in one zone and to 2e-4 to 5e-4 in the split (damped best response on an 11-point grid; the split does not settle exactly).
+
+**Limits.** Zonal game with exogenous flow limits (taken from the competitive dispatch of the study), no redispatch, no nodal equilibrium, no EPEC; ownership by federal state; list of units of 10 MW and above; demand elasticity and price cap assumed; a one-shot game for each hour without dynamics or contracts; 200 of 1,464 hours. Not an estimate of market power in Germany and not a forecast of a real split.
 
 ## Limits
 - The proposition rests on a price-taking fringe, constant marginal costs and ample capacity; it does not cover capacity withholding, increasing costs or a feedback of redispatch on bidding in the one zone.
